@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Интерактивные 3D-модели: инсулин по рентгеноструктуре PDB 1WAV, кинуреновая и хинолиновая кислоты по расчёту GFN2-xTB.">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>3D-атлас биомолекул</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: навигация, заголовок, две карточки-ссылки с превью моделей, блок управления, подвал */
+:root{
+  --bg:#EEF1F0; --surface:#F7F9F8; --stage:#FBFCFC; --ink:#111C20; --ink-2:#56666C; --rule:#CCD5D6;
+  --ins:#C8455A; --kq:#0B7A70;
+  --font-body:"Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1215; --surface:#10191D; --stage:#070C0F; --ink:#E3EBED; --ink-2:#93A5AB; --rule:#24343A;
+    --ins:#EE6A7C; --kq:#3BC2B3;
+    color-scheme:dark;
+  }
+  :root:not([data-theme="light"]) .th-light{display:none}
+  :root:not([data-theme="light"]) .th-dark{display:block}
+}
+:root[data-theme="dark"]{
+  --bg:#0B1215; --surface:#10191D; --stage:#070C0F; --ink:#E3EBED; --ink-2:#93A5AB; --rule:#24343A;
+  --ins:#EE6A7C; --kq:#3BC2B3;
+  color-scheme:dark;
+}
+:root[data-theme="dark"] .th-light{display:none}
+:root[data-theme="dark"] .th-dark{display:block}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-body)}
+a{color:inherit}
+a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+.site-nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 18px;max-width:1180px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:12px;border-bottom:1px solid var(--rule);font:500 13px/1.3 var(--font-mono)}
+.site-home{font-weight:800;text-decoration:none;color:var(--ink)}
+.site-links{display:flex;flex-wrap:wrap;gap:4px}
+.site-links a{padding:5px 9px;border-radius:4px;text-decoration:none;color:var(--ink-2)}
+.site-links a:hover{color:var(--ink)}
+.site-links a[aria-current="page"]{background:var(--ink);color:var(--bg)}
+
+.wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:28px 56px;display:grid;gap:36px}
+.top{display:grid;gap:10px}
+.eyebrow{margin:0;font:500 12px/1.4 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+h1{margin:0;font:800 clamp(34px,5.4vw,60px)/1 var(--font-mono);letter-spacing:-.035em;text-wrap:balance}
+.lede{margin:4px 0 0;max-width:66ch;font-size:16.5px;color:var(--ink-2);text-wrap:pretty}
+
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2.6vw,28px)}
+.card{display:grid;grid-template-rows:auto 1fr;min-width:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--surface);text-decoration:none;color:inherit;transition:border-color .15s ease}
+.card:hover{border-color:var(--ink-2)}
+.media{position:relative;aspect-ratio:16/10;background:var(--stage);border-bottom:3px solid var(--acc)}
+.th{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.th-dark{display:none}
+.body{display:flex;flex-direction:column;gap:10px;padding:18px 20px 20px}
+.kicker{margin:0;font:500 11px/1.3 var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+h2{margin:0;font:800 clamp(22px,2.4vw,28px)/1.1 var(--font-mono);letter-spacing:-.02em;color:var(--acc);text-wrap:balance}
+.body p{margin:0;text-wrap:pretty}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 0;padding:0;list-style:none}
+.chips li{padding:3px 8px;border:1px solid var(--rule);border-radius:4px;font:500 12px/1.4 var(--font-mono);color:var(--ink-2)}
+.go{margin-top:auto;padding-top:4px;font:700 14px var(--font-mono);color:var(--ink)}
+.go span{display:inline-block;transition:transform .15s ease}
+.card:hover .go span{transform:translateX(4px)}
+
+.howto{display:grid;gap:14px;padding-top:22px;border-top:1px solid var(--rule)}
+.howto-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 32px}
+.howto h3{margin:0 0 8px;font:700 15px var(--font-mono)}
+.howto dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:0;font-size:14px}
+.howto dt{color:var(--ink-2)}
+.howto dd{margin:0}
+.howto p{margin:0;font-size:14px;text-wrap:pretty}
+
+.foot{margin:0;font-size:13px;color:var(--ink-2);max-width:90ch;text-wrap:pretty}
+
+@media (max-width:860px){
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .howto-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+
+<nav class="site-nav" aria-label="Разделы атласа">
+  <a class="site-home" href="index.html" aria-current="page">3D-атлас биомолекул</a>
+  <span class="site-links"><a href="insulin.html">Инсулин</a><a href="kyna-quin.html">KYNA и QUIN</a></span>
+</nav>
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Интерактивные модели · координаты атомов</p>
+    <h1>3D-атлас биомолекул</h1>
+    <p class="lede">Модели строятся прямо в браузере по координатам атомов, их можно вращать, приближать и разбирать по частям. Инсулин показан по рентгеноструктуре из Protein Data Bank, кинуреновая и хинолиновая кислоты — по квантово-химическому расчёту.</p>
+  </header>
+
+  <main class="cards">
+    <a class="card" href="insulin.html" style="--acc:var(--ins)">
+      <div class="media">
+        <img class="th th-light" src="img/insulin-light.webp" width="1200" height="750" alt="Гексамер инсулина: шесть молекул вокруг двух ионов цинка">
+        <img class="th th-dark" src="img/insulin-dark.webp" width="1200" height="750" alt="Гексамер инсулина: шесть молекул вокруг двух ионов цинка">
+      </div>
+      <div class="body">
+        <p class="kicker">Белок · PDB 1WAV · 2,5 Å</p>
+        <h2>Инсулин</h2>
+        <p>Гексамер с двумя ионами Zn²⁺ и фенолом, димер и мономер с тремя дисульфидными мостиками. На отдельной вкладке показаны замены в шести аналогах, от лизпро до деглудека.</p>
+        <ul class="chips"><li>гексамер · димер · мономер</li><li>51 остаток</li><li>6 аналогов</li></ul>
+        <p class="go">Открыть модель <span aria-hidden="true">→</span></p>
+      </div>
+    </a>
+    <a class="card" href="kyna-quin.html" style="--acc:var(--kq)">
+      <div class="media">
+        <img class="th th-light" src="img/kyna-quin-light.webp" width="1200" height="750" alt="Кинуреновая и хинолиновая кислоты в шаростержневой модели">
+        <img class="th th-dark" src="img/kyna-quin-dark.webp" width="1200" height="750" alt="Кинуреновая и хинолиновая кислоты в шаростержневой модели">
+      </div>
+      <div class="body">
+        <p class="kicker">Метаболиты триптофана · GFN2-xTB</p>
+        <h2>Кинуреновая и хинолиновая кислоты</h2>
+        <p>Два продукта кинуренинового пути с противоположным действием на NMDA-рецептор. Формы при pH 7,4, таутомеры кинуреновой кислоты, заряды атомов, схема пути и сравнение фармакологии.</p>
+        <ul class="chips"><li>6 форм</li><li>заряды атомов</li><li>схема пути</li></ul>
+        <p class="go">Открыть модели <span aria-hidden="true">→</span></p>
+      </div>
+    </a>
+  </main>
+
+  <section class="howto" aria-labelledby="h-howto">
+    <p class="kicker" id="h-howto">Управление 3D-моделью</p>
+    <div class="howto-grid">
+      <div><h3>Мышь</h3>
+        <dl><dt>Вращение</dt><dd>левая кнопка</dd><dt>Масштаб</dt><dd>колесо или правая кнопка</dd><dt>Сдвиг</dt><dd>средняя кнопка или Ctrl + левая</dd></dl></div>
+      <div><h3>Телефон</h3>
+        <dl><dt>Вращение</dt><dd>один палец</dd><dt>Масштаб</dt><dd>два пальца</dd><dt>Сдвиг</dt><dd>три пальца</dd></dl></div>
+      <div><h3>Подсказки</h3>
+        <p>Нажмите на атом или остаток, чтобы увидеть описание. Страницу листайте за пределами 3D-окна: внутри него жесты управляют моделью.</p></div>
+    </div>
+  </section>
+
+  <p class="foot">Визуализация: 3Dmol.js. Координаты инсулина: RCSB PDB, запись 1WAV. Геометрия кинуреновой и хинолиновой кислот: xtb 6.7.1, метод GFN2-xTB с неявной моделью воды. Источники приведены внизу каждой страницы.</p>
+</div>
+
+</body>
+</html>

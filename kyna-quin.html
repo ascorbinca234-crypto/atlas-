@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px/1.5 system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Кинуреновая и хинолиновая кислоты</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: общая панель управления, две равные 3D-сцены бок о бок, ниже схема кинуренинового пути и сравнение */
+:root{
+  --bg:#EEF1F0; --surface:#F7F9F8; --stage:#FBFCFC; --ink:#111C20; --ink-2:#56666C; --rule:#CCD5D6; --label-bg:#FFFFFF;
+  --kyna:#0B7A70; --kyna-soft:#D6EEEA; --quin:#BF4D1B; --quin-soft:#F8E1D5;
+  --el-c:#4B555B; --el-h:#D2D9DC; --el-n:#2F55D4; --el-o:#D63A2F;
+  --q-neg:#D63A2F; --q-mid:#E9EDEE; --q-pos:#2F63D6; --hb:#56666C;
+  --font-body:"Golos Text", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono:"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1215; --surface:#10191D; --stage:#070C0F; --ink:#E3EBED; --ink-2:#93A5AB; --rule:#24343A; --label-bg:#0C1518;
+    --kyna:#3BC2B3; --kyna-soft:#123A36; --quin:#F2894D; --quin-soft:#44230F;
+    --el-c:#A3AFB5; --el-h:#EEF2F3; --el-n:#7690FF; --el-o:#FF6559;
+    --q-neg:#FF5E52; --q-mid:#34424A; --q-pos:#5B8DFF; --hb:#9FB0B6;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1215; --surface:#10191D; --stage:#070C0F; --ink:#E3EBED; --ink-2:#93A5AB; --rule:#24343A; --label-bg:#0C1518;
+  --kyna:#3BC2B3; --kyna-soft:#123A36; --quin:#F2894D; --quin-soft:#44230F;
+  --el-c:#A3AFB5; --el-h:#EEF2F3; --el-n:#7690FF; --el-o:#FF6559;
+  --q-neg:#FF5E52; --q-mid:#34424A; --q-pos:#5B8DFF; --hb:#9FB0B6;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--font-body)}
+button,input{font:inherit;color:inherit}
+a{color:inherit;text-decoration-color:var(--ink-2);text-underline-offset:3px}
+button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+sub,sup{font-size:.72em;line-height:0}
+
+.wrap{max-width:1320px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:18px 56px;display:grid;gap:30px}
+.top{display:grid;gap:8px}
+.eyebrow{margin:0;font:500 12px/1.4 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+h1{margin:0;font:800 clamp(28px,4.2vw,46px)/1.05 var(--font-mono);letter-spacing:-.03em;text-wrap:balance}
+.lede{margin:2px 0 0;max-width:70ch;color:var(--ink-2);text-wrap:pretty}
+.lede b{color:var(--ink);font-weight:600}
+
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;padding-block:12px;border-block:1px solid var(--rule)}
+.ctl{display:flex;align-items:center;gap:10px;min-width:0}
+.ctl-label{font-size:13px;color:var(--ink-2)}
+.seg{display:flex;flex-wrap:wrap;width:max-content;max-width:100%;border:1px solid var(--rule);border-radius:5px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;border-left:1px solid var(--rule);background:transparent;padding:6px 11px;font-size:13px;font-weight:500;color:var(--ink-2);cursor:pointer}
+.seg button:first-child{border-left:0}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.tools{display:flex;gap:6px;margin-left:auto}
+.tool{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--rule);border-radius:4px;background:var(--surface);font-size:12.5px;font-weight:500;cursor:pointer}
+.tool svg{width:15px;height:15px;flex:none}
+.tool[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin:0;padding:0;list-style:none;font-size:12.5px;color:var(--ink-2);width:100%}
+.legend li{display:inline-flex;align-items:center;gap:6px}
+.dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 18%,transparent)}
+.hbline{width:18px;height:0;border-top:2px dashed var(--hb)}
+.qbar{display:inline-block;width:92px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--q-neg),var(--q-mid),var(--q-pos));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ink) 15%,transparent)}
+.qnum{font:500 11.5px var(--font-mono)}
+
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2.4vw,32px)}
+.mol{display:grid;gap:12px;align-content:start;min-width:0}
+.mol-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:10px 16px}
+.mol-name{display:grid;gap:2px;min-width:0}
+.kicker{margin:0;font:500 11px/1.2 var(--font-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2)}
+h2{margin:0;font:800 30px/1 var(--font-mono);letter-spacing:-.02em;color:var(--acc)}
+.forms{display:flex;flex-wrap:wrap;gap:6px}
+.stage{position:relative;aspect-ratio:3/2;max-width:100%;border:1px solid var(--rule);border-top:3px solid var(--acc);border-radius:6px;background:var(--stage);overflow:hidden}
+.viewer{position:absolute;inset:0}
+.notice{position:absolute;inset:0;display:grid;place-items:center;padding:24px;text-align:center;color:var(--ink-2);font:500 13px/1.5 var(--font-mono);background:var(--stage);z-index:2}
+.readout{margin:0;min-height:22px;font:500 12.5px/1.45 var(--font-mono);color:var(--ink-2)}
+.readout b{color:var(--ink);font-weight:700}
+.props{display:grid;grid-template-columns:92px minmax(0,1fr);gap:8px 14px;margin:0;font-size:14px}
+.props dt{font:700 10.5px/2 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.props dd{margin:0;min-width:0;text-wrap:pretty}
+.props .mono{font:500 12.5px/1.6 var(--font-mono);overflow-wrap:anywhere}
+.note{margin:0;padding:10px 12px;border-radius:5px;background:var(--surface);border:1px solid var(--rule);font-size:13.5px;color:var(--ink-2);text-wrap:pretty}
+.note b{color:var(--ink);font-weight:600}
+
+.sec{display:grid;gap:14px;min-width:0}
+.sec-head{display:grid;gap:4px}
+h3{margin:0;font:700 22px/1.15 var(--font-mono);letter-spacing:-.015em}
+.sec-sub{margin:0;color:var(--ink-2);max-width:72ch;text-wrap:pretty}
+.path-scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:6px;background:var(--surface)}
+#path{display:block;width:100%;min-width:860px;height:auto}
+#path .node rect{fill:var(--stage);stroke:var(--rule);stroke-width:1.2}
+#path .node.kyna rect{fill:var(--kyna-soft);stroke:var(--kyna);stroke-width:2}
+#path .node.quin rect{fill:var(--quin-soft);stroke:var(--quin);stroke-width:2}
+#path .ab{font:700 13px var(--font-mono);fill:var(--ink);text-anchor:middle}
+#path .nm{font:400 10px var(--font-body);fill:var(--ink-2);text-anchor:middle}
+#path .en{font:700 10px var(--font-mono);fill:var(--ink);text-anchor:middle}
+#path .en.l{text-anchor:start}
+#path .cap{font:400 10.5px var(--font-body);fill:var(--ink-2)}
+#path .cap.c{text-anchor:middle}
+#path .arr{stroke:var(--ink-2);stroke-width:1.5;fill:none}
+#path .arr.dash{stroke-dasharray:4 3}
+#path .ah{fill:var(--ink-2)}
+#path .bbb rect{fill:none;stroke:var(--ink-2);stroke-width:1.2;stroke-dasharray:5 4}
+
+.cmp{display:grid;border-top:1px solid var(--rule)}
+.cmp-row{display:grid;grid-template-columns:170px minmax(0,1fr) minmax(0,1fr);gap:8px 24px;padding-block:12px;border-bottom:1px solid var(--rule)}
+.cmp-row > div{min-width:0;text-wrap:pretty;font-size:14.5px}
+.cmp-k{font:700 11px/1.9 var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.cmp-row.head{padding-block:8px}
+.tag{font:800 14px var(--font-mono)}
+.tag.kyna{color:var(--kyna)} .tag.quin{color:var(--quin)}
+
+.foot{display:grid;gap:10px;font-size:13px;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:16px}
+.foot p{margin:0;max-width:90ch;text-wrap:pretty}
+.refs{margin:0;padding-left:18px;display:grid;gap:4px;max-width:100ch}
+
+@media (max-width:980px){
+  .pair{grid-template-columns:minmax(0,1fr)}
+  .stage{aspect-ratio:4/3;max-height:70vh;margin-inline:auto;width:100%}
+}
+@media (max-width:640px){
+  .tools{margin-left:0}
+  .tool .t{display:none}
+  .tool{padding:0 9px}
+  .ctl{flex-wrap:wrap;gap:6px}
+  .cmp-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 14px}
+  .cmp-row .cmp-k{grid-column:1/-1}
+  .cmp-row.head .cmp-k{display:none}
+  .props{grid-template-columns:minmax(0,1fr);gap:2px}
+  .props dd{margin-bottom:8px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<style>.site-nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 18px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:12px;border-bottom:1px solid var(--rule);font:500 13px/1.3 var(--font-mono)}.site-home{font-weight:800;text-decoration:none;color:var(--ink)}.site-home span{color:var(--ink-2)}.site-links{display:flex;flex-wrap:wrap;gap:4px}.site-links a{padding:5px 9px;border-radius:4px;text-decoration:none;color:var(--ink-2)}.site-links a:hover{color:var(--ink)}.site-links a[aria-current="page"]{background:var(--ink);color:var(--bg)}.site-nav a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}</style>
+</head>
+<body>
+<nav class="site-nav" aria-label="Разделы атласа" style="max-width:1320px"><a class="site-home" href="index.html"><span aria-hidden="true">←</span> 3D-атлас биомолекул</a><span class="site-links"><a href="insulin.html">Инсулин</a><a href="kyna-quin.html" aria-current="page">KYNA и QUIN</a></span></nav>
+
+
+<div class="wrap">
+  <header class="top">
+    <p class="eyebrow">Метаболиты триптофана · кинурениновый путь</p>
+    <h1>Кинуреновая и хинолиновая кислоты</h1>
+    <p class="lede">Два метаболита кинуренинового пути с противоположным действием на NMDA-рецептор: <b>KYNA</b> блокирует его глициновый участок, <b>QUIN</b> активирует рецептор как агонист. Геометрия всех форм рассчитана методом GFN2-xTB в модели воды. Обе сцены показаны в одном масштабе.</p>
+  </header>
+
+  <section class="bar" aria-label="Изображение моделей">
+    <div class="ctl"><span class="ctl-label" id="lblRep">Модель</span>
+      <div class="seg" id="segRep" role="group" aria-labelledby="lblRep">
+        <button type="button" data-v="ball" aria-pressed="true">Шары и стержни</button>
+        <button type="button" data-v="stick" aria-pressed="false">Стержни</button>
+        <button type="button" data-v="sphere" aria-pressed="false">Объём</button>
+        <button type="button" data-v="charge" aria-pressed="false">Заряд</button>
+      </div>
+    </div>
+    <div class="ctl"><span class="ctl-label" id="lblLab">Подписи</span>
+      <div class="seg" id="segLab" role="group" aria-labelledby="lblLab">
+        <button type="button" data-v="num" aria-pressed="true">Номера</button>
+        <button type="button" data-v="q" aria-pressed="false">Заряды</button>
+        <button type="button" data-v="none" aria-pressed="false">Нет</button>
+      </div>
+    </div>
+    <div class="tools">
+      <button class="tool" id="btnSpin" type="button" aria-pressed="false" aria-label="Вращение"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9"/><path d="M12.2 1.6v2.9H9.3"/></svg><span class="t">Вращение</span></button>
+      <button class="tool" id="btnRuler" type="button" aria-pressed="false" aria-label="Линейка"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M1.8 10.6 10.6 1.8l3.6 3.6-8.8 8.8z"/><path d="M5 7.4l1.4 1.4M7.2 5.2l1.4 1.4M9.4 3l1.4 1.4"/></svg><span class="t">Линейка</span></button>
+      <button class="tool" id="btnReset" type="button" aria-label="Сбросить вид"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M8 1v3M8 12v3M1 8h3M12 8h3"/></svg><span class="t">Сбросить вид</span></button>
+    </div>
+    <ul class="legend" id="legend">
+      <li><span class="dot" style="background:var(--el-c)"></span>C</li>
+      <li><span class="dot" style="background:var(--el-h)"></span>H</li>
+      <li><span class="dot" style="background:var(--el-n)"></span>N</li>
+      <li><span class="dot" style="background:var(--el-o)"></span>O</li>
+      <li><span class="hbline"></span>внутримолекулярная водородная связь</li>
+      <li id="qLegend" hidden><span class="qnum">−0,7 e</span><span class="qbar"></span><span class="qnum">+0,7 e</span><span>частичный заряд атома</span></li>
+    </ul>
+  </section>
+
+  <main class="pair">
+    <section class="mol" id="card-kyna" style="--acc:var(--kyna)" aria-labelledby="h-kyna">
+      <div class="mol-head">
+        <div class="mol-name"><p class="kicker">Кинуреновая кислота</p><h2 id="h-kyna">KYNA</h2></div>
+        <div class="forms">
+          <div class="seg" role="group" aria-label="Ионизация KYNA" data-mol="kyna" data-field="ion">
+            <button type="button" data-v="anion" aria-pressed="true">pH 7,4</button>
+            <button type="button" data-v="neutral" aria-pressed="false">Нейтральная</button>
+          </div>
+          <div class="seg" role="group" aria-label="Таутомер KYNA" data-mol="kyna" data-field="taut">
+            <button type="button" data-v="hydroxy" aria-pressed="true">4-гидрокси</button>
+            <button type="button" data-v="oxo" aria-pressed="false">4-оксо</button>
+          </div>
+        </div>
+      </div>
+      <div class="stage"><div class="viewer" id="v-kyna"></div><div class="notice" data-notice>Загружаю модель…</div></div>
+      <p class="readout" id="r-kyna" aria-live="polite"></p>
+      <dl class="props" id="p-kyna"></dl>
+      <p class="note"><b>Таутомеры.</b> В воде 4-гидрокси- и 4-оксо-формы присутствуют в сопоставимом соотношении (ЯМР и DFT, Buzásy et&nbsp;al., 2025). В кристаллах описаны полиморфы с разными таутомерами (Pogoda et&nbsp;al., 2019).</p>
+    </section>
+
+    <section class="mol" id="card-quin" style="--acc:var(--quin)" aria-labelledby="h-quin">
+      <div class="mol-head">
+        <div class="mol-name"><p class="kicker">Хинолиновая кислота</p><h2 id="h-quin">QUIN</h2></div>
+        <div class="forms">
+          <div class="seg" role="group" aria-label="Ионизация QUIN" data-mol="quin" data-field="ion">
+            <button type="button" data-v="anion" aria-pressed="true">pH 7,4</button>
+            <button type="button" data-v="neutral" aria-pressed="false">Нейтральная</button>
+          </div>
+        </div>
+      </div>
+      <div class="stage"><div class="viewer" id="v-quin"></div><div class="notice" data-notice>Загружаю модель…</div></div>
+      <p class="readout" id="r-quin" aria-live="polite"></p>
+      <dl class="props" id="p-quin"></dl>
+    </section>
+  </main>
+
+  <section class="sec" aria-labelledby="h-path">
+    <div class="sec-head">
+      <p class="kicker">Откуда они берутся</p>
+      <h3 id="h-path">Кинурениновый путь</h3>
+      <p class="sec-sub">Около 95&nbsp;% свободного триптофана, не ушедшего на синтез белка, катаболизируется по этому пути. Ветви расходятся на L-кинуренине: трансаминирование даёт KYNA, гидроксилирование ведёт к QUIN и далее к NAD<sup>+</sup>.</p>
+    </div>
+    <div class="path-scroll">
+      <svg id="path" viewBox="0 0 1016 292" role="img" aria-label="Схема: триптофан, N-формилкинуренин, L-кинуренин; от кинуренина через KAT II к кинуреновой кислоте, через KMO, кинурениназу и 3-HAO к полуальдегиду ACMS, который без фермента циклизуется в хинолиновую кислоту; QPRT превращает её в NAD+, ACMSD отводит ACMS к пиколиновой кислоте">
+        <defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0 0L8 4L0 8z"/></marker></defs>
+        <g class="node"><rect x="16" y="17" width="124" height="46" rx="6"/><text class="ab" x="78" y="37">Trp</text><text class="nm" x="78" y="53">триптофан</text></g>
+        <g class="node"><rect x="188" y="17" width="124" height="46" rx="6"/><text class="ab" x="250" y="37">NFK</text><text class="nm" x="250" y="53">N-формилкинуренин</text></g>
+        <g class="node"><rect x="360" y="17" width="124" height="46" rx="6"/><text class="ab" x="422" y="37">L-KYN</text><text class="nm" x="422" y="53">L-кинуренин</text></g>
+        <g class="node kyna"><rect x="532" y="17" width="124" height="46" rx="6"/><text class="ab" x="594" y="37">KYNA</text><text class="nm" x="594" y="53">кинуреновая к-та</text></g>
+        <g class="bbb"><rect x="704" y="17" width="296" height="46" rx="6"/><text class="cap" x="716" y="36">ГЭБ: Trp и L-кинуренин проходят через LAT1,</text><text class="cap" x="716" y="52">KYNA и QUIN из крови проникают плохо</text></g>
+        <path class="arr" d="M142 40H184" marker-end="url(#ah)"/><text class="en" x="164" y="33">IDO/TDO</text>
+        <path class="arr" d="M314 40H356" marker-end="url(#ah)"/><text class="en" x="336" y="33">AFMID</text>
+        <path class="arr" d="M486 40H528" marker-end="url(#ah)"/><text class="en" x="508" y="33">KAT II</text>
+        <text class="cap c" x="594" y="80">в астроцитах</text>
+        <path class="arr" d="M422 65V123" marker-end="url(#ah)"/><text class="en l" x="430" y="92">KMO</text><text class="cap" x="430" y="106">в микроглии</text>
+        <g class="node"><rect x="360" y="127" width="124" height="46" rx="6"/><text class="ab" x="422" y="147">3-HK</text><text class="nm" x="422" y="163">3-OH-кинуренин</text></g>
+        <g class="node"><rect x="532" y="127" width="124" height="46" rx="6"/><text class="ab" x="594" y="147">3-HAA</text><text class="nm" x="594" y="163">3-OH-антраниловая</text></g>
+        <g class="node"><rect x="704" y="127" width="124" height="46" rx="6"/><text class="ab" x="766" y="147">ACMS</text><text class="nm" x="766" y="163">полуальдегид</text></g>
+        <g class="node quin"><rect x="876" y="127" width="124" height="46" rx="6"/><text class="ab" x="938" y="147">QUIN</text><text class="nm" x="938" y="163">хинолиновая к-та</text></g>
+        <path class="arr" d="M486 150H528" marker-end="url(#ah)"/><text class="en" x="508" y="143">KYNU</text>
+        <path class="arr" d="M658 150H700" marker-end="url(#ah)"/><text class="en" x="680" y="143">3-HAO</text>
+        <path class="arr dash" d="M830 150H872" marker-end="url(#ah)"/>
+        <text class="cap" x="16" y="138">В астроцитах человека нет KMO,</text>
+        <text class="cap" x="16" y="154">поэтому кинуренин идёт в KYNA.</text>
+        <text class="cap" x="16" y="170">QUIN синтезирует микроглия.</text>
+        <path class="arr" d="M766 175V225" marker-end="url(#ah)"/><text class="en l" x="774" y="204">ACMSD</text>
+        <path class="arr" d="M938 175V225" marker-end="url(#ah)"/><text class="en l" x="946" y="204">QPRT</text>
+        <g class="node"><rect x="704" y="229" width="124" height="46" rx="6"/><text class="ab" x="766" y="249">PIC</text><text class="nm" x="766" y="265">пиколиновая к-та</text></g>
+        <g class="node"><rect x="876" y="229" width="124" height="46" rx="6"/><text class="ab" x="938" y="249">NAD⁺</text><text class="nm" x="938" y="265">кофермент</text></g>
+        <path class="arr" d="M16 240H50" marker-end="url(#ah)"/><text class="cap" x="60" y="244">ферментативная реакция</text>
+        <path class="arr dash" d="M16 264H50" marker-end="url(#ah)"/><text class="cap" x="60" y="268">без фермента: ACMS циклизуется сам</text>
+        </svg>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="h-cmp">
+    <div class="sec-head">
+      <p class="kicker">Фармакология</p>
+      <h3 id="h-cmp">Сравнение</h3>
+    </div>
+    <div class="cmp">
+      <div class="cmp-row head"><div class="cmp-k"></div><div class="tag kyna">KYNA</div><div class="tag quin">QUIN</div></div>
+      <div class="cmp-row"><div class="cmp-k">NMDA-рецептор</div>
+        <div>Антагонист глицинового участка (субъединица GluN1). В более высоких концентрациях блокирует также AMPA- и каинатные рецепторы.</div>
+        <div>Агонист, действует на рецепторы с субъединицами GluN2A и GluN2B. Активность около ¼ от NMDA, на уровне глутамата и аспартата.</div></div>
+      <div class="cmp-row"><div class="cmp-k">Другие мишени</div>
+        <div>Агонист GPR35, лиганд AhR. Антагонизм к α7-никотиновым рецепторам описан, но воспроизводится не во всех работах.</div>
+        <div>Комплекс с Fe²⁺ генерирует гидроксильные радикалы: перекисное окисление липидов, разрывы ДНК. Усиливает выброс глутамата и тормозит его обратный захват астроцитами.</div></div>
+      <div class="cmp-row"><div class="cmp-k">Где образуется в мозге</div>
+        <div>Астроциты. KAT II даёт до 75&nbsp;% KYNA в большинстве отделов мозга; промежуточный продукт трансаминирования циклизуется необратимо.</div>
+        <div>Активированная микроглия и макрофаги. Нейроны и астроциты содержат QPRT и её утилизируют.</div></div>
+      <div class="cmp-row"><div class="cmp-k">Дальше по пути</div>
+        <div>Конечный продукт своей ветви.</div>
+        <div>QPRT превращает в никотинат-мононуклеотид, далее синтез NAD<sup>+</sup>.</div></div>
+      <div class="cmp-row"><div class="cmp-k">Психиатрия</div>
+        <div>При шизофрении повышена в ЦСЖ и ткани мозга, в крови без отличий (метаанализ, Plitman et&nbsp;al., 2017).</div>
+        <div>При терапии IFN-α растёт в ЦСЖ вместе с кинуренином, рост коррелирует с депрессивными симптомами (Raison et&nbsp;al., 2010). При тяжёлой депрессии больше QUIN в микроглии передней поясной извилины (посмертно, Steiner et&nbsp;al., 2011).</div></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <p><b>Метод.</b> Геометрия рассчитана методом GFN2-xTB (xtb 6.7.1) с неявной моделью воды ALPB. Для каждой формы оптимизировано от 4 до 36 стартовых конформаций, показан минимум энергии. Частичные заряды атомов взяты из того же расчёта. Разности энергий конформаций — полуэмпирическая оценка, не эксперимент.</p>
+    <ol class="refs">
+      <li><a href="https://www.mdpi.com/2076-3921/14/5/589" target="_blank" rel="noopener">Buzásy et al. Physicochemical characterization of kynurenine pathway metabolites. <i>Antioxidants</i>, 2025</a> — pKa и таутомерия KYNA</li>
+      <li><a href="https://doi.org/10.1107/S2053229619005990" target="_blank" rel="noopener">Pogoda et al. Tautomeric polymorphism of the neuroactive inhibitor kynurenic acid. <i>Acta Cryst. C</i>, 2019</a></li>
+      <li><a href="https://doi.org/10.3390/ijms25169082" target="_blank" rel="noopener">Alves, Moore, Kell. The biology and biochemistry of kynurenic acid. <i>Int. J. Mol. Sci.</i>, 2024</a></li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3780648/" target="_blank" rel="noopener">Lugo-Huitrón et al. Quinolinic acid: an endogenous neurotoxin with multiple targets. <i>Oxid. Med. Cell. Longev.</i>, 2013</a></li>
+      <li><a href="https://doi.org/10.1046/j.1471-4159.2001.00498.x" target="_blank" rel="noopener">Guillemin et al. Kynurenine pathway metabolism in human astrocytes. <i>J. Neurochem.</i>, 2001</a></li>
+      <li><a href="https://academic.oup.com/schizophreniabulletin/article/43/4/764/2982261" target="_blank" rel="noopener">Plitman et al. Kynurenic acid in schizophrenia: a systematic review and meta-analysis. <i>Schizophr. Bull.</i>, 2017</a></li>
+      <li><a href="https://www.nature.com/articles/mp2009116" target="_blank" rel="noopener">Raison et al. CSF concentrations of brain tryptophan and kynurenines during immune stimulation with IFN-α. <i>Mol. Psychiatry</i>, 2010</a></li>
+      <li><a href="https://doi.org/10.1186/1742-2094-8-94" target="_blank" rel="noopener">Steiner et al. Severe depression is associated with increased microglial quinolinic acid. <i>J. Neuroinflammation</i>, 2011</a></li>
+      <li><a href="https://doi.org/10.1021/acs.jctc.8b01176" target="_blank" rel="noopener">Bannwarth, Ehlert, Grimme. GFN2-xTB. <i>J. Chem. Theory Comput.</i>, 2019</a></li>
+    </ol>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var DATA = {"kyna_oxo_anion":{"atoms":[["N","N1",1.185,-1.365,0.0,-0.091],["C","C2",2.368,-0.723,-0.001,0.023],["C","C3",2.447,0.634,-0.0,-0.088],["C","C4",1.266,1.45,0.001,0.21],["C","C4A",0.002,0.708,0.0,-0.031],["C","C5",-1.223,1.387,-0.0,-0.023],["C","C6",-2.412,0.698,-0.001,-0.041],["C","C7",-2.407,-0.698,-0.0,-0.028],["C","C8",-1.221,-1.392,0.0,-0.054],["C","C8A",-0.004,-0.699,0.0,0.072],["C","C9",3.585,-1.658,-0.002,0.362],["O","O9A",4.715,-1.141,-0.004,-0.628],["O","O9B",3.305,-2.877,-0.001,-0.633],["O","O4",1.298,2.696,0.002,-0.553],["H","H1",1.252,-2.382,0.0,0.224],["H","H3",3.419,1.103,-0.001,0.034],["H","H5",-1.187,2.466,-0.0,0.053],["H","H6",-3.348,1.234,-0.001,0.063],["H","H7",-3.342,-1.235,-0.001,0.071],["H","H8",-1.206,-2.471,0.001,0.059]],"bonds":[[0,1,1],[1,2,2],[2,3,1],[3,4,1],[4,9,2],[9,0,1],[4,5,1],[5,6,2],[6,7,1],[7,8,2],[8,9,1],[1,10,1],[10,11,1.5],[10,12,1.5],[3,13,2],[0,14,1],[2,15,1],[5,16,1],[6,17,1],[7,18,1],[8,19,1]],"charge":-1,"E":-39.953926499871,"twist":{"C9":0},"hb":[[14,12,2.11]]},"kyna_oxo_neutral":{"atoms":[["N","N1",1.183,-1.373,-0.0,-0.081],["C","C2",2.369,-0.723,0.0,0.047],["C","C3",2.451,0.636,0.0,-0.081],["C","C4",1.261,1.454,-0.0,0.22],["C","C4A",0.0,0.709,-0.0,-0.027],["C","C5",-1.224,1.388,0.0,-0.021],["C","C6",-2.412,0.698,0.0,-0.036],["C","C7",-2.406,-0.698,0.0,-0.024],["C","C8",-1.22,-1.392,-0.0,-0.054],["C","C8A",-0.003,-0.699,-0.0,0.075],["C","C9",3.563,-1.614,0.002,0.366],["O","O9A",3.456,-2.825,0.004,-0.472],["O","O9B",4.709,-0.976,0.001,-0.396],["H","H9",5.481,-1.578,0.002,0.436],["O","O4",1.304,2.693,-0.001,-0.526],["H","H1",1.205,-2.388,0.0,0.24],["H","H3",3.41,1.128,0.001,0.081],["H","H5",-1.193,2.467,0.0,0.055],["H","H6",-3.349,1.232,0.001,0.059],["H","H7",-3.342,-1.235,0.0,0.069],["H","H8",-1.212,-2.471,-0.0,0.07]],"bonds":[[0,1,1],[1,2,2],[2,3,1],[3,4,1],[4,9,2],[9,0,1],[4,5,1],[5,6,2],[6,7,1],[7,8,2],[8,9,1],[1,10,1],[10,11,2],[10,12,1],[12,13,1],[3,14,2],[0,15,1],[2,16,1],[5,17,1],[6,18,1],[7,19,1],[8,20,1]],"charge":0,"E":-40.138408043505,"twist":{"C9":0},"hb":[[15,11,2.29]]},"kyna_hydroxy_anion":{"atoms":[["N","N1",1.194,-1.393,0.005,-0.301],["C","C2",2.323,-0.73,0.002,0.051],["C","C3",2.399,0.677,-0.007,-0.089],["C","C4",1.246,1.421,-0.001,0.151],["C","C4A",0.0,0.735,0.004,-0.022],["C","C5",-1.24,1.399,0.004,-0.034],["C","C6",-2.406,0.684,-0.0,-0.039],["C","C7",-2.374,-0.718,-0.003,-0.033],["C","C8",-1.182,-1.39,-0.004,-0.045],["C","C8A",0.039,-0.684,0.001,0.085],["C","C9",3.648,-1.493,-0.003,0.361],["O","O9A",3.787,-2.436,0.8,-0.641],["O","O9B",4.51,-1.068,-0.806,-0.656],["O","O4",1.232,2.771,-0.003,-0.424],["H","H4",2.135,3.126,-0.021,0.379],["H","H3",3.381,1.127,-0.033,0.023],["H","H5",-1.239,2.478,0.005,0.061],["H","H6",-3.356,1.195,-0.001,0.061],["H","H7",-3.301,-1.27,-0.005,0.06],["H","H8",-1.132,-2.467,-0.005,0.051]],"bonds":[[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,9,2],[9,0,1],[4,5,1],[5,6,2],[6,7,1],[7,8,2],[8,9,1],[1,10,1],[10,11,1.5],[10,12,1.5],[3,13,1],[13,14,1],[2,15,1],[5,16,1],[6,17,1],[7,18,1],[8,19,1]],"charge":-1,"E":-39.939366277756,"twist":{"C9":46},"hb":[]},"kyna_hydroxy_neutral":{"atoms":[["N","N1",1.183,-1.392,0.0,-0.272],["C","C2",2.315,-0.721,0.0,0.05],["C","C3",2.414,0.675,-0.0,-0.088],["C","C4",1.252,1.42,-0.0,0.168],["C","C4A",0.007,0.729,0.0,-0.014],["C","C5",-1.23,1.4,0.0,-0.03],["C","C6",-2.4,0.69,0.0,-0.031],["C","C7",-2.379,-0.713,-0.0,-0.027],["C","C8",-1.193,-1.395,-0.0,-0.045],["C","C8A",0.03,-0.693,0.0,0.089],["C","C9",3.552,-1.558,-0.0,0.358],["O","O9A",4.671,-1.088,-0.001,-0.472],["O","O9B",3.333,-2.86,0.001,-0.401],["H","H9",2.36,-3.026,0.001,0.417],["O","O4",1.232,2.757,-0.0,-0.411],["H","H4",2.128,3.133,-0.001,0.392],["H","H3",3.396,1.122,-0.0,0.061],["H","H5",-1.227,2.479,-0.0,0.065],["H","H6",-3.346,1.207,-0.0,0.06],["H","H7",-3.312,-1.255,-0.001,0.062],["H","H8",-1.162,-2.472,-0.0,0.07]],"bonds":[[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,9,2],[9,0,1],[4,5,1],[5,6,2],[6,7,1],[7,8,2],[8,9,1],[1,10,1],[10,11,2],[10,12,1],[12,13,1],[3,14,1],[14,15,1],[2,16,1],[5,17,1],[6,18,1],[7,19,1],[8,20,1]],"charge":0,"E":-40.135385965225,"twist":{"C9":0},"hb":[[13,0,2.01]]},"quin_dianion":{"atoms":[["N","N1",0.009,-1.382,0.003,-0.274],["C","C2",1.148,-0.7,0.0,0.055],["C","C3",1.187,0.7,-0.004,-0.049],["C","C4",-0.012,1.395,0.004,-0.013],["C","C5",-1.203,0.684,-0.001,-0.053],["C","C6",-1.13,-0.696,-0.003,0.05],["C","C7",2.471,-1.458,0.052,0.368],["O","O7A",2.803,-2.121,-0.951,-0.639],["O","O7B",3.114,-1.352,1.121,-0.664],["C","C8",2.518,1.428,-0.006,0.367],["O","O8A",2.711,2.247,0.921,-0.653],["O","O8B",3.299,1.192,-0.954,-0.668],["H","H4",0.012,2.476,0.019,0.033],["H","H5",-2.154,1.191,0.001,0.074],["H","H6",-2.019,-1.312,-0.005,0.066]],"bonds":[[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1],[1,6,1],[6,7,1.5],[6,8,1.5],[2,9,1],[9,10,1.5],[9,11,1.5],[3,12,1],[4,13,1],[5,14,1]],"charge":-2,"E":-36.371973197048,"twist":{"C7":68,"C8":57},"hb":[]},"quin_neutral":{"atoms":[["N","N1",0.01,-1.382,-0.0,-0.22],["C","C2",1.143,-0.7,0.007,0.084],["C","C3",1.188,0.7,-0.006,-0.025],["C","C4",-0.015,1.402,-0.0,-0.004],["C","C5",-1.198,0.683,0.006,-0.036],["C","C6",-1.128,-0.703,-0.006,0.064],["C","C7",2.419,-1.494,0.086,0.38],["O","O7A",3.003,-1.689,1.129,-0.473],["O","O7B",2.777,-1.992,-1.074,-0.392],["H","H7",3.592,-2.533,-1.023,0.432],["C","C8",2.506,1.369,-0.049,0.367],["O","O8A",3.538,0.776,-0.298,-0.489],["O","O8B",2.455,2.662,0.199,-0.397],["H","H8",3.334,3.09,0.162,0.429],["H","H4",-0.004,2.48,-0.008,0.097],["H","H5",-2.152,1.184,0.012,0.094],["H","H6",-2.02,-1.313,-0.021,0.09]],"bonds":[[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1],[1,6,1],[6,7,2],[6,8,1],[8,9,1],[2,10,1],[10,11,2],[10,12,1],[12,13,1],[3,14,1],[4,15,1],[5,16,1]],"charge":0,"E":-36.754069348881,"twist":{"C7":80,"C8":13},"hb":[]}};
+  var LIBS = [
+    "vendor/3Dmol-min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/3Dmol/2.5.5/3Dmol-min.js",
+    "https://cdn.jsdelivr.net/npm/3dmol@2.5.5/build/3Dmol-min.js",
+    "https://unpkg.com/3dmol@2.5.5/build/3Dmol-min.js"
+  ];
+  var FONT_MONO = '"JetBrains Mono", ui-monospace, Menlo, monospace';
+  var reduceMotion = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var MOLS = ["kyna", "quin"];
+
+  var LOC = {
+    kyna: { N1: "1", C2: "2", C3: "3", C4: "4", C4A: "4a", C5: "5", C6: "6", C7: "7", C8: "8", C8A: "8a" },
+    quin: { N1: "1", C2: "2", C3: "3", C4: "4", C5: "5", C6: "6" }
+  };
+  var CARBOXYL = { kyna: { C9: 1, O9A: 1, O9B: 1 }, quin: { C7: 1, O7A: 1, O7B: 1, C8: 1, O8A: 1, O8B: 1 } };
+  var ELEM_RU = { C: "углерод", N: "азот", O: "кислород", H: "водород" };
+
+  var KYNA_ANION = { formula: "C<sub>10</sub>H<sub>6</sub>NO<sub>3</sub><sup>−</sup>", charge: "−1: карбоксил диссоциирован (pKa 2,43)" };
+  var KYNA_NEUTRAL = { formula: "C<sub>10</sub>H<sub>7</sub>NO<sub>3</sub> · 189,17 г/моль", charge: "0. При pH 7,4 доля этой формы около 0,001&nbsp;%" };
+  var INFO = {
+    kyna_hydroxy_anion: { name: "4-гидроксихинолин-2-карбоксилат", smiles: "[O-]C(=O)c1cc(O)c2ccccc2n1", f: KYNA_ANION,
+      geo: "Карбоксилат повёрнут к плоскости кольца на 46°. Вращается почти свободно: от 0 до 90° энергия меняется меньше чем на 0,3&nbsp;ккал/моль, это меньше RT при 37&nbsp;°C (0,62&nbsp;ккал/моль)." },
+    kyna_oxo_anion: { name: "4-оксо-1,4-дигидрохинолин-2-карбоксилат", smiles: "[O-]C(=O)C1=CC(=O)c2ccccc2N1", f: KYNA_ANION,
+      geo: "Молекула плоская. Водородная связь N1–H···O⁻ (2,11&nbsp;Å) удерживает карбоксилат в плоскости кольца: поворот на 90° стоит 4,6&nbsp;ккал/моль." },
+    kyna_hydroxy_neutral: { name: "4-гидроксихинолин-2-карбоновая кислота", smiles: "OC(=O)c1cc(O)c2ccccc2n1", f: KYNA_NEUTRAL,
+      geo: "Молекула плоская. OH карбоксила образует водородную связь с N1 (H···N 2,01&nbsp;Å)." },
+    kyna_oxo_neutral: { name: "4-оксо-1,4-дигидрохинолин-2-карбоновая кислота", smiles: "OC(=O)C1=CC(=O)c2ccccc2N1", f: KYNA_NEUTRAL,
+      geo: "Молекула плоская. N1–H образует водородную связь с C=O карбоксила (H···O 2,29&nbsp;Å)." },
+    quin_dianion: { name: "пиридин-2,3-дикарбоксилат", smiles: "[O-]C(=O)c1cccnc1C(=O)[O-]",
+      f: { formula: "C<sub>7</sub>H<sub>3</sub>NO<sub>4</sub><sup>2−</sup>", charge: "−2: оба карбоксила диссоциированы" },
+      geo: "Соседние карбоксилаты не умещаются в плоскости кольца: повёрнуты на 68° (при C2) и 57° (при C3). Перпендикулярная конформация выше по энергии всего на 0,4&nbsp;ккал/моль." },
+    quin_neutral: { name: "пиридин-2,3-дикарбоновая кислота", smiles: "OC(=O)c1cccnc1C(=O)O",
+      f: { formula: "C<sub>7</sub>H<sub>5</sub>NO<sub>4</sub> · 167,12 г/моль", charge: "0. При pH 7,4 практически не встречается" },
+      geo: "Карбоксил при C2 повёрнут к кольцу на 80°, при C3 лежит почти в плоскости кольца (13°)." }
+  };
+
+  var state = { rep: "ball", labels: "num", spin: !reduceMotion, ruler: false,
+    kyna: { ion: "anion", taut: "hydroxy" }, quin: { ion: "anion" } };
+  var V = {}, T = {}, themeKey = "", Q0 = null, ZOOM = null;
+
+  function formKey(mol) {
+    var s = state[mol];
+    if (mol === "kyna") return "kyna_" + s.taut + "_" + (s.ion === "anion" ? "anion" : "neutral");
+    return s.ion === "anion" ? "quin_dianion" : "quin_neutral";
+  }
+
+  /* ---------- цвета ---------- */
+  function readTokens() {
+    var cs = getComputedStyle(document.documentElement);
+    ["stage", "ink", "ink-2", "rule", "label-bg", "el-c", "el-h", "el-n", "el-o", "q-neg", "q-mid", "q-pos", "hb", "kyna", "quin"].forEach(function (k) {
+      T[k] = cs.getPropertyValue("--" + k).trim();
+    });
+    themeKey = T.stage + T.ink;
+  }
+  function hex2rgb(h) { h = h.replace("#", ""); if (h.length === 3) h = h.replace(/(.)/g, "$1$1"); var n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; }
+  function mix(a, b, t) { var A = hex2rgb(a), B = hex2rgb(b); return "#" + A.map(function (v, i) { return Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0"); }).join(""); }
+  var QMAX = 0.7;
+  function qColor(q) {
+    var t = Math.max(-1, Math.min(1, q / QMAX));
+    return t < 0 ? mix(T["q-mid"], T["q-neg"], -t) : mix(T["q-mid"], T["q-pos"], t);
+  }
+  function elemColor(a) { return T["el-" + a.elem.toLowerCase()] || T["el-c"]; }
+  function chargeOf(a) { return a.properties && typeof a.properties.q === "number" ? a.properties.q : 0; }
+  function fmtQ(q) { return (q < 0 ? "−" : "+") + Math.abs(q).toFixed(2).replace(".", ","); }
+  function fmtD(d) { return d.toFixed(2).replace(".", ",") + " Å"; }
+
+  /* ---------- атомы ---------- */
+  function toAtoms(rec) {
+    var list = rec.atoms.map(function (a, i) {
+      return { elem: a[0], atom: a[1], x: a[2], y: a[3], z: a[4], index: i, serial: i, resn: "LIG", resi: 1, chain: "A", hetflag: true,
+        bonds: [], bondOrder: [], properties: { q: a[5] } };
+    });
+    rec.bonds.forEach(function (b) {
+      list[b[0]].bonds.push(b[1]); list[b[0]].bondOrder.push(b[2]);
+      list[b[1]].bonds.push(b[0]); list[b[1]].bondOrder.push(b[2]);
+    });
+    return list;
+  }
+  function describe(mol, a) {
+    var key = formKey(mol), name = a.atom, loc = LOC[mol][name], anion = state[mol].ion === "anion";
+    var what;
+    var carbH = (mol === "kyna" && name === "H9") || (mol === "quin" && (name === "H7" || name === "H8"));
+    if (loc) what = ELEM_RU[a.elem] + ", положение " + loc;
+    else if (CARBOXYL[mol][name]) what = ELEM_RU[a.elem] + (anion ? " карбоксилата" : " карбоксила");
+    else if (name === "O4") what = key.indexOf("oxo") > 0 ? "кислород 4-оксогруппы" : "кислород 4-гидроксигруппы";
+    else if (carbH) what = "водород карбоксила";
+    else if (mol === "kyna" && name === "H1") what = "водород при N1";
+    else if (mol === "kyna" && name === "H4") what = "водород 4-OH";
+    else what = "водород при C" + name.slice(1);
+    return "<b>" + a.elem + "</b> · " + what + " · заряд " + fmtQ(chargeOf(a)) + "&nbsp;e";
+  }
+
+  /* ---------- отрисовка ---------- */
+  function label(vw, text, pos, extra) {
+    var spec = { position: pos, font: FONT_MONO, fontSize: 12, bold: true, fontColor: T.ink, backgroundColor: T["label-bg"], backgroundOpacity: 0.88,
+      borderThickness: 1, borderColor: T.rule, borderOpacity: 1, padding: 2, inFront: true, alignment: "center", screenOffset: { x: 12, y: -12 } };
+    if (extra) for (var k in extra) spec[k] = extra[k];
+    return vw.addLabel(text, spec);
+  }
+  function applyStyle(mol) {
+    var o = V[mol], vw = o.viewer, rep = state.rep;
+    vw.removeAllShapes(); vw.removeAllLabels(); vw.removeAllSurfaces();
+    vw.setStyle({}, {});
+    if (rep === "ball") {
+      vw.setStyle({}, { stick: { radius: 0.12, doubleBondScaling: 0.5, colorfunc: elemColor }, sphere: { scale: 0.26, colorfunc: elemColor } });
+      vw.setStyle({ elem: "H" }, { stick: { radius: 0.12, colorfunc: elemColor }, sphere: { scale: 0.19, colorfunc: elemColor } });
+    } else if (rep === "stick") {
+      vw.setStyle({}, { stick: { radius: 0.17, doubleBondScaling: 0.45, colorfunc: elemColor } });
+    } else if (rep === "sphere") {
+      vw.setStyle({}, { sphere: { scale: 1, colorfunc: elemColor } });
+    } else {
+      vw.setStyle({}, { stick: { radius: 0.1, doubleBondScaling: 0.5, colorfunc: elemColor } });
+      var p = vw.addSurface("VDW", { opacity: 0.84, colorfunc: function (a) { return qColor(chargeOf(a)); } }, {}, {});
+      if (p && p.then) p.then(function () { vw.render(); }, function () {});
+    }
+    var atoms = o.model.selectedAtoms({});
+    // внутримолекулярные водородные связи: видны только в шаростержневой модели и стержнях
+    if (rep === "ball" || rep === "stick") (o.rec.hb || []).forEach(function (h) {
+      var A = atoms[h[0]], B = atoms[h[1]];
+      vw.addCylinder({ start: A, end: B, radius: 0.045, color: T.hb, dashed: true, dashLength: 0.16, gapLength: 0.13, fromCap: 1, toCap: 1 });
+      if (state.labels === "num") label(vw, fmtD(h[2]), { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2, z: (A.z + B.z) / 2 }, { fontColor: T["ink-2"], bold: false, screenOffset: { x: 0, y: 0 } });
+    });
+    if (state.labels === "num") {
+      atoms.forEach(function (a) { var l = LOC[mol][a.atom]; if (l) label(vw, l, a); });
+    } else if (state.labels === "q") {
+      atoms.forEach(function (a) {
+        var polarH = a.elem === "H" && a.bonds.some(function (j) { return atoms[j].elem !== "C"; });
+        if (a.elem === "N" || a.elem === "O" || polarH) label(vw, fmtQ(chargeOf(a)), a, { fontColor: chargeOf(a) < 0 ? T["q-neg"] : T["q-pos"] });
+      });
+    }
+    // линейка
+    o.meas.forEach(function (m) {
+      var A = atoms[m[0]], B = atoms[m[1]];
+      if (m.length === 1) { vw.addSphere({ center: A, radius: 0.55, color: T[mol], opacity: 0.55 }); return; }
+      vw.addCylinder({ start: A, end: B, radius: 0.05, color: T[mol], dashed: true, dashLength: 0.2, gapLength: 0.12, fromCap: 1, toCap: 1 });
+      var d = Math.hypot(A.x - B.x, A.y - B.y, A.z - B.z);
+      label(vw, fmtD(d), { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2, z: (A.z + B.z) / 2 }, { fontColor: T.stage, backgroundColor: T[mol], borderColor: T[mol], screenOffset: { x: 0, y: -12 } });
+    });
+    vw.render();
+  }
+  function load(mol) {
+    var o = V[mol], vw = o.viewer, key = formKey(mol);
+    o.rec = DATA[key]; o.meas = [];
+    vw.removeAllModels();
+    o.model = vw.addModel();
+    o.model.addAtoms(toAtoms(o.rec));
+    vw.setHoverable({}, true, function (a) { $("#r-" + mol).innerHTML = describe(mol, a); }, function () { restoreReadout(mol); });
+    vw.setClickable({}, true, function (a) { onPick(mol, a); });
+    applyStyle(mol);
+    updateCard(mol);
+    restoreReadout(mol);
+  }
+  function onPick(mol, a) {
+    var o = V[mol];
+    if (!state.ruler) { $("#r-" + mol).innerHTML = describe(mol, a); return; }
+    var last = o.meas[o.meas.length - 1];
+    if (last && last.length === 1) { if (last[0] !== a.index) last.push(a.index); }
+    else o.meas.push([a.index]);
+    if (o.meas.length > 4) o.meas.shift();
+    applyStyle(mol);
+    restoreReadout(mol);
+  }
+  function restoreReadout(mol) {
+    var el = $("#r-" + mol), o = V[mol];
+    if (state.ruler) {
+      var last = o && o.meas[o.meas.length - 1];
+      el.innerHTML = last && last.length === 1 ? "Выберите второй атом" : "Линейка: выберите два атома";
+    } else el.innerHTML = "Наведите на атом или нажмите на него";
+  }
+
+  /* ---------- карточки ---------- */
+  function updateCard(mol) {
+    var key = formKey(mol), inf = INFO[key];
+    $("#p-" + mol).innerHTML =
+      "<dt>Название</dt><dd>" + inf.name + "</dd>" +
+      "<dt>Формула</dt><dd>" + inf.f.formula + "</dd>" +
+      "<dt>Заряд</dt><dd>" + inf.f.charge + "</dd>" +
+      "<dt>SMILES</dt><dd class=\"mono\">" + inf.smiles + "</dd>" +
+      "<dt>Геометрия</dt><dd>" + inf.geo + "</dd>";
+    document.querySelectorAll('.seg[data-mol="' + mol + '"]').forEach(function (g) {
+      g.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(state[mol][g.dataset.field] === b.dataset.v)); });
+    });
+  }
+  function updateBar() {
+    document.querySelectorAll("#segRep button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === state.rep)); });
+    document.querySelectorAll("#segLab button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.v === state.labels)); });
+    $("#btnSpin").setAttribute("aria-pressed", String(state.spin));
+    $("#btnRuler").setAttribute("aria-pressed", String(state.ruler));
+    $("#qLegend").hidden = !(state.rep === "charge" || state.labels === "q");
+  }
+
+  /* ---------- камера ---------- */
+  function qAxis(ax, deg) { var h = deg * Math.PI / 360, s = Math.sin(h); return [ax[0] * s, ax[1] * s, ax[2] * s, Math.cos(h)]; }
+  function qMul(a, b) {
+    return [a[3] * b[0] + a[0] * b[3] + a[1] * b[2] - a[2] * b[1], a[3] * b[1] - a[0] * b[2] + a[1] * b[3] + a[2] * b[0],
+      a[3] * b[2] + a[0] * b[1] - a[1] * b[0] + a[2] * b[3], a[3] * b[3] - a[0] * b[0] - a[1] * b[1] - a[2] * b[2]];
+  }
+  function qRot(q, v) {
+    var x = v[0], y = v[1], z = v[2], qx = q[0], qy = q[1], qz = q[2], qw = q[3];
+    var ix = qw * x + qy * z - qz * y, iy = qw * y + qz * x - qx * z, iz = qw * z + qx * y - qy * x, iw = -qx * x - qy * y - qz * z;
+    return [ix * qw + iw * -qx + iy * -qz - iz * -qy, iy * qw + iw * -qy + iz * -qx - ix * -qz, iz * qw + iw * -qz + ix * -qy - iy * -qx];
+  }
+  function homeView(mol) { var c = V[mol].center; return [-c.x, -c.y, -c.z, ZOOM, Q0[0], Q0[1], Q0[2], Q0[3]]; }
+  var fitAspect = 0;
+  // Общий масштаб: молекула вращается вокруг вертикали экрана, поэтому по высоте нужен размах по y,
+  // по ширине — наибольший радиус в плоскости xz. Берём самую «большую» из двух молекул.
+  function fitCommon() {
+    var el = $("#v-kyna"), aspect = el.clientWidth / Math.max(1, el.clientHeight), tanH = Math.tan(10 * Math.PI / 180), need = 0;
+    MOLS.forEach(function (m) {
+      var c = V[m].center, ymax = 0, rmax = 0;
+      V[m].model.selectedAtoms({}).forEach(function (a) {
+        var p = qRot(Q0, [a.x - c.x, a.y - c.y, a.z - c.z]);
+        ymax = Math.max(ymax, Math.abs(p[1])); rmax = Math.max(rmax, Math.hypot(p[0], p[2]));
+      });
+      // перспектива: при вращении атомы подходят к камере на rmax и выглядят крупнее
+      var m = 1.9, r = rmax + m, t = tanH * aspect;
+      need = Math.max(need, (ymax + m) / tanH + rmax, Math.sqrt(r * r / (t * t) + r * r));
+    });
+    ZOOM = 150 - need;
+    fitAspect = aspect;
+    MOLS.forEach(function (m) { V[m].viewer.setView(homeView(m)); });
+  }
+  function applySpin() {
+    MOLS.forEach(function (m) {
+      var vw = V[m] && V[m].viewer; if (!vw) return;
+      vw.spin(false);
+      if (state.spin) vw.spin("vy", 0.35, !!document.body.checkVisibility);
+    });
+  }
+
+  /* ---------- события ---------- */
+  function wire() {
+    document.querySelectorAll("#segRep button").forEach(function (b) {
+      b.addEventListener("click", function () { state.rep = b.dataset.v; updateBar(); MOLS.forEach(function (m) { if (V[m]) applyStyle(m); }); });
+    });
+    document.querySelectorAll("#segLab button").forEach(function (b) {
+      b.addEventListener("click", function () { state.labels = b.dataset.v; updateBar(); MOLS.forEach(function (m) { if (V[m]) applyStyle(m); }); });
+    });
+    document.querySelectorAll(".seg[data-mol]").forEach(function (g) {
+      g.addEventListener("click", function (e) {
+        var b = e.target.closest("button"); if (!b) return;
+        var mol = g.dataset.mol; state[mol][g.dataset.field] = b.dataset.v;
+        if (V[mol]) load(mol); else updateCard(mol);
+      });
+    });
+    $("#btnSpin").addEventListener("click", function () { state.spin = !state.spin; updateBar(); applySpin(); });
+    $("#btnRuler").addEventListener("click", function () {
+      state.ruler = !state.ruler; updateBar();
+      MOLS.forEach(function (m) { if (!V[m]) return; if (!state.ruler) { V[m].meas = []; applyStyle(m); } restoreReadout(m); });
+    });
+    $("#btnReset").addEventListener("click", function () {
+      MOLS.forEach(function (m) { if (V[m]) { V[m].meas = []; applyStyle(m); V[m].viewer.setView(homeView(m)); restoreReadout(m); } });
+    });
+  }
+
+  /* ---------- запуск ---------- */
+  function notice(t) { document.querySelectorAll("[data-notice]").forEach(function (n) { n.textContent = t; n.hidden = !t; }); }
+  function start() {
+    readTokens();
+    Q0 = qMul(qAxis([1, 0, 0], -24), qAxis([0, 1, 0], 16));
+    if (window.$3Dmol.setSyncSurface) window.$3Dmol.setSyncSurface(true);
+    try {
+      MOLS.forEach(function (m) {
+        var vw = window.$3Dmol.createViewer($("#v-" + m), { backgroundColor: T.stage, antialias: true });
+        if (!vw) throw new Error("webgl");
+        vw.setHoverDuration(60);
+        V[m] = { viewer: vw, meas: [] };
+      });
+    } catch (e) {
+      V = {};
+      notice("Браузер не поддерживает WebGL, поэтому 3D-модели недоступны. Описания ниже работают.");
+      return;
+    }
+    MOLS.forEach(function (m) {
+      load(m);
+      var at = V[m].model.selectedAtoms({}), lo = [1e9, 1e9, 1e9], hi = [-1e9, -1e9, -1e9];
+      at.forEach(function (a) { [a.x, a.y, a.z].forEach(function (v, i) { lo[i] = Math.min(lo[i], v); hi[i] = Math.max(hi[i], v); }); });
+      V[m].center = { x: (lo[0] + hi[0]) / 2, y: (lo[1] + hi[1]) / 2, z: 0 };
+    });
+    fitCommon();
+    notice("");
+    applySpin();
+    if ("ResizeObserver" in window) {
+      var ro = new ResizeObserver(function () {
+        MOLS.forEach(function (m) { V[m].viewer.resize(); });
+        var el = $("#v-kyna"), a = el.clientWidth / Math.max(1, el.clientHeight);
+        if (fitAspect && Math.abs(a - fitAspect) / fitAspect > 0.1) fitCommon();
+      });
+      MOLS.forEach(function (m) { ro.observe($("#v-" + m)); });
+    }
+    var retheme = function () {
+      var before = themeKey; readTokens();
+      if (themeKey === before) return;
+      MOLS.forEach(function (m) { V[m].viewer.setBackgroundColor(T.stage, 1); applyStyle(m); });
+    };
+    if (window.matchMedia) {
+      var mq = matchMedia("(prefers-color-scheme: dark)");
+      if (mq.addEventListener) mq.addEventListener("change", retheme); else if (mq.addListener) mq.addListener(retheme);
+    }
+    new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+  }
+  function whenFonts(cb) {
+    var done = false, go = function () { if (!done) { done = true; cb(); } };
+    setTimeout(go, 1500);
+    if (document.fonts && document.fonts.load) document.fonts.load('11px "JetBrains Mono"').then(go, go); else go();
+  }
+  function loadLib(i) {
+    if (window.$3Dmol && window.$3Dmol.createViewer) return whenFonts(start);
+    if (i >= LIBS.length) { notice("Не удалось загрузить библиотеку 3Dmol.js. Проверьте подключение к интернету и обновите страницу."); return; }
+    var s = document.createElement("script");
+    s.src = LIBS[i]; s.async = true;
+    s.onload = function () { if (window.$3Dmol && window.$3Dmol.createViewer) whenFonts(start); else loadLib(i + 1); };
+    s.onerror = function () { s.remove(); loadLib(i + 1); };
+    document.head.appendChild(s);
+  }
+
+  wire();
+  updateBar();
+  MOLS.forEach(function (m) { updateCard(m); restoreReadout(m); });
+  loadLib(0);
+})();
+</script>
+
+</body>
+</html>
